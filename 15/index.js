@@ -17,7 +17,7 @@ function genB(number) {
 } 
 
 var count = 0;
-for (var i = 0; i < 40000000; i++) {
+for (var i = 0; i < 5000000; i++) {
     generatorA = genA(generatorA)
     generatorB = genB(generatorB)
     let binaryA = generatorA.toString(2);
@@ -25,6 +25,7 @@ for (var i = 0; i < 40000000; i++) {
     if (binaryA.slice(binaryA.length - 16) == binaryB.slice(binaryB.length - 16)) {
         count++;
     }
+    //console.log(i);
 }
 
 console.log(count);
