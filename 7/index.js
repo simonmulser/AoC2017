@@ -1,9 +1,9 @@
 'use strict'
 
 class Element {
-    constructor(name, value, children){
+    constructor(name, weight, children){
         this.name = name;
-        this.value = value;
+        this.weight = weight;
         this.children = children;
     }
 }
@@ -11,19 +11,20 @@ class Element {
 const fs = require('fs');
 
 const input = fs.readFileSync('input.txt', 'utf8');
-var arr = input.split('\n')
-.map(function(item){
+var map = input.split('\n')
+.reduce(function(map, item){
     let name = item.match(/^[a-z]+/g)[0];
-    let value = item.match(/[0-9]+/g)[0];
+    let weight = parseInt(item.match(/[0-9]+/g)[0]);
     let children = item.match(/[a-z]+/g);
     children.splice(children.indexOf(name), 1);
-    return new Element(name, value, children);
-})
+    map[name] = new Element(name, weight, children);
+    return map;
+}, {});
 
 var children = new Map();
 var potential = []
-for (let i = 0; i < arr.length; i++) {
-    let elem =  arr[i];
+for (var key in map) {
+    let elem =  map[key];
     if(!children.has(elem.name)) {
         potential.push(elem.name)
     }
@@ -32,8 +33,28 @@ for (let i = 0; i < arr.length; i++) {
     }
 }
 
+var bottom;
+
 for (let i = 0; i < potential.length; i++) {
     if(!children.has(potential[i])) {
-        console.log(potential[i])
+       bottom = potential[i];
+    }
+}
+
+console.log(bottom);
+
+calcWeight(bottom, map);
+
+function calcWeight(id, map) {
+    let elem = map[id];
+    if(elem.children.length > 0) {
+        let weights = elem.children.map(child => calcWeight(child, map));
+        if(!weights.reduce(function(a, b){ return (a === b) ? a : NaN; })){
+            console.log(weights);
+            console.log(elem.children);
+        }
+        return elem.weight + weights.reduce(function(sum, weight){return sum + weight;}, 0);
+    } else {
+        return elem.weight;
     }
 }
